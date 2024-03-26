@@ -1,0 +1,2 @@
+python train.py --hyp data/hyp.scratch.yaml --cfg models/SRyolo_MFB2.yaml --name MFB --cache-images --epochs 300 --batch-size 4
+python train.py --hyp data/hyp.scratch.yaml --cfg models/SRyolo_MFC.yaml --name MFC --cache-images --epochs 300 --batch-size 4
