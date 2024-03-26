@@ -84,10 +84,8 @@ def _initialize_biases(self, cf=None):  # initialize biases into Detect(), cf is
             b.data += math.log(0.6 / (m.nc - 0.99999)) if cf is None else torch.log(cf / cf.sum())  # cls
             mi[-1].bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
+class IDHead_Detect(nn.Module):
 
-
-class TSCODE_Detect(nn.Module):
-    # YOLOv5 Detect head for detection models
     stride = None  # strides computed during build
     dynamic = False  # force grid reconstruction
     export = False  # export mode
@@ -102,7 +100,6 @@ class TSCODE_Detect(nn.Module):
         self.anchor_grid = [torch.empty(0) for _ in range(self.nl)]  # init anchor grid
         self.register_buffer('anchors', torch.tensor(anchors).float().view(self.nl, -1, 2))  # shape(nl,na,2)
         self.m_sce = nn.ModuleList(SCE(ch[id:id+2]) for id in range(1, len(ch) - 1))
-        self.m_dpe = nn.ModuleList(DPE(ch[id-1:id+2], ch[id]) for id in range(1, len(ch) - 1))
         
         self.m_cls = nn.ModuleList(nn.Sequential(Conv(sum(ch[id:id+2]), ch[id], 1), Conv(ch[id], ch[id], 3), nn.Conv2d(ch[id], self.na * self.nc * 4, 1)) for id in range(1, len(ch) - 1))  # cls conv
         self.m_reg_conf = nn.ModuleList(nn.Sequential(*[Conv(ch[id], ch[id], 3) for i in range(2)]) for id in range(1, len(ch) - 1))  # reg_conf stem conv
@@ -117,7 +114,7 @@ class TSCODE_Detect(nn.Module):
         for i, idx in enumerate(range(1, self.nl + 1)):
             bs, _, ny, nx = x_[idx].shape
             
-            x_sce, x_dpe = self.m_sce[i](x_[idx:idx+2]), self.m_dpe[i](x_[idx-1:idx+2])
+            x_sce= self.m_sce[i](x_[idx:idx+2]))
             x_cls = rearrange(self.m_cls[i](x_sce), 'bs (nl ph pw nc) h w -> bs nl nc (h ph) (w pw)', nl=self.nl, ph=self.ph, pw=self.pw, nc=self.nc)
             x_cls = x_cls.permute(0, 1, 3, 4, 2).contiguous()
             
